@@ -1,21 +1,13 @@
 import { notFound } from "next/navigation";
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
-
 async function getTodo(id: string) {
   const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`);
-
   if (!res.ok) return undefined;
-
   return res.json();
 }
 
-export default async function TodoPage({ params }: Props) {
-  const todo = await getTodo(params.id); // ← You MUST await here
+export default async function Page({ params }: { params: { id: string } }) {
+  const todo = await getTodo(params.id);
 
   if (!todo) return notFound();
 
