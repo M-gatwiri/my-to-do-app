@@ -28,10 +28,10 @@ This todo application helps users stay organized by managing tasks efficiently. 
 ## Screenshots
 
 ### screenshot 1
-![Homepage] (./images/images.png)
+![Homepage](./images/images.png)
 
 ### screenshot 2
-![Todo List] (./images/image2.png)
+![Todo List](./images/image2.png)
 
 ## 🛠 Installation & Setup
 
