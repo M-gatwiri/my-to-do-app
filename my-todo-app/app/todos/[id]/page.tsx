@@ -6,19 +6,31 @@ type Props = {
   };
 };
 
-export default async function TodoDetailPage({ params }: Props) {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${params.id}`);
+async function getTodo(id: string) {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`);
 
-  if (!res.ok) {
-    notFound();
-  }
+  if (!res.ok) return undefined;
 
-  const todo = await res.json();
+  return res.json();
+}
+
+export default async function TodoPage({ params }: Props) {
+  const todo = await getTodo(params.id); // ← You MUST await here
+
+  if (!todo) return notFound();
 
   return (
-    <div className="mt-10 text-center">
-      <h1 className="text-2xl font-bold">{todo.title}</h1>
-      <p>Status: {todo.completed ? "✅ Completed" : "❌ Pending"}</p>
+    <div>
+      <h1 className="text-3xl font-bold mb-4">Todo Item</h1>
+      <p>
+        <strong>ID:</strong> {todo.id}
+      </p>
+      <p>
+        <strong>Title:</strong> {todo.title}
+      </p>
+      <p>
+        <strong>Completed:</strong> {todo.completed ? "Yes" : "No"}
+      </p>
     </div>
   );
 }
