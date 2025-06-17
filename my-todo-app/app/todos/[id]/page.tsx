@@ -1,4 +1,5 @@
 import React from "react";
+import { notFound } from "next/navigation";
 
 interface Todo {
   id: number;
@@ -6,17 +7,17 @@ interface Todo {
   completed: boolean;
 }
 
-interface PageProps {
+interface Params {
   params: {
     id: string;
   };
 }
 
-const TodoDetailPage = async ({ params }: PageProps) => {
+const TodoDetailPage = async ({ params }: Params) => {
   const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${params.id}`);
 
   if (!res.ok) {
-    return <div className="text-red-600 text-center mt-10">Todo not found</div>;
+    notFound(); // Proper Next.js handling for 404
   }
 
   const todo: Todo = await res.json();
@@ -24,7 +25,7 @@ const TodoDetailPage = async ({ params }: PageProps) => {
   return (
     <div className="mt-10 text-center">
       <h1 className="text-2xl font-bold">{todo.title}</h1>
-      <p>Status: {todo.completed ? "Completed" : "Pending"}</p>
+      <p>Status: {todo.completed ? "✅ Completed" : "❌ Pending"}</p>
     </div>
   );
 };
