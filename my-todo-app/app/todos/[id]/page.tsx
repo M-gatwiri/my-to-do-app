@@ -13,16 +13,9 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4">Todo Item</h1>
-      <p>
-        <strong>ID:</strong> {todo.id}
-      </p>
-      <p>
-        <strong>Title:</strong> {todo.title}
-      </p>
-      <p>
-        <strong>Completed:</strong> {todo.completed ? "Yes" : "No"}
-      </p>
+      <h1>Todo #{todo.id}</h1>
+      <p>{todo.title}</p>
+      <p>Status: {todo.completed ? "Completed ✅" : "Incomplete ❌"}</p>
     </div>
   );
 }
