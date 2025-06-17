@@ -1,26 +1,19 @@
-import React from "react";
 import { notFound } from "next/navigation";
 
-interface Todo {
-  id: number;
-  title: string;
-  completed: boolean;
-}
-
-interface Params {
+type Props = {
   params: {
     id: string;
   };
-}
+};
 
-const TodoDetailPage = async ({ params }: Params) => {
+export default async function TodoDetailPage({ params }: Props) {
   const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${params.id}`);
 
   if (!res.ok) {
-    notFound(); // Proper Next.js handling for 404
+    notFound();
   }
 
-  const todo: Todo = await res.json();
+  const todo = await res.json();
 
   return (
     <div className="mt-10 text-center">
@@ -28,6 +21,4 @@ const TodoDetailPage = async ({ params }: Params) => {
       <p>Status: {todo.completed ? "✅ Completed" : "❌ Pending"}</p>
     </div>
   );
-};
-
-export default TodoDetailPage;
+}
