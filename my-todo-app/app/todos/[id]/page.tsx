@@ -1,21 +1,34 @@
 import { notFound } from 'next/navigation';
 
-async function getTodo(id: string) {
+type Todo = {
+  id: number;
+  title: string;
+  completed: boolean;
+};
+
+async function getTodo(id: string): Promise<Todo | null> {
   const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`);
-  if (!res.ok) return undefined;
+
+  if (!res.ok) return null;
+
   return res.json();
 }
-
 export async function generateStaticParams() {
   const res = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=10');
-  const todos: { id: number }[] = await res.json();
+  const todos: Todo[] = await res.json();
 
   return todos.map((todo) => ({
     id: todo.id.toString(),
   }));
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function Page({ params }: PageProps) {
   const todo = await getTodo(params.id);
 
   if (!todo) return notFound();
