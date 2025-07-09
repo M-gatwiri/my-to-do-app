@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import useSWR from 'swr';
 import Link from 'next/link';
 
 interface Todo {
@@ -9,35 +10,37 @@ interface Todo {
   completed: boolean;
 }
 
+// SWR fetcher function
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch todos');
+  return res.json();
+};
 
 const TodosPage = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const todosPerPage = 10;
 
-  useEffect(() => {
-    const fetchTodos = async () => {
-      try {
-        const res = await fetch('https://jsonplaceholder.typicode.com/todos/');
-        if (!res.ok) throw new Error('Failed to fetch todos');
-        const data: Todo[] = await res.json();
-        setTodos(data);
-      } catch (err) {
-        setError((err as Error).message);
-      }
-    };
-    fetchTodos();
-  }, []);
+  // SWR hook
+  const { data: todos, error, isLoading } = useSWR<Todo[]>(
+    'https://jsonplaceholder.typicode.com/todos/',
+    fetcher
+  );
 
-  // Filtered list based on search term
+  if (error) {
+    return <div className="text-red-600 text-center mt-10">Error: {error.message}</div>;
+  }
+
+  if (isLoading || !todos) {
+    return <div className="text-center mt-10">Loading...</div>;
+  }
+
   const filteredTodos = todos.filter((todo) =>
     todo.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Pagination logic
   const indexOfLastTodo = currentPage * todosPerPage;
   const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
   const currentTodos = filteredTodos.slice(indexOfFirstTodo, indexOfLastTodo);
@@ -45,18 +48,13 @@ const TodosPage = () => {
 
   const handleSearch = () => {
     setSearchTerm(searchInput);
-    setCurrentPage(1); // reset to first page on new search
+    setCurrentPage(1);
   };
-
-  if (error) {
-    return <div className="text-red-600 text-center mt-10">Error: {error}</div>;
-  }
 
   return (
     <main className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">Todo List</h1>
 
-      {/* Search Input and Button */}
       <div className="mb-6 flex gap-2">
         <input
           type="text"
@@ -95,7 +93,6 @@ const TodosPage = () => {
         )}
       </ul>
 
-      {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-8 space-x-2">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
