@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 
@@ -22,12 +22,19 @@ const TodosPage = () => {
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const todosPerPage = 10;
+  const [hasMounted, setHasMounted] = useState(false);
 
-  // SWR hook
+  // Avoid hydration mismatch by ensuring this only runs on client
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const { data: todos, error, isLoading } = useSWR<Todo[]>(
     'https://jsonplaceholder.typicode.com/todos/',
     fetcher
   );
+
+  if (!hasMounted) return null;
 
   if (error) {
     return <div className="text-red-600 text-center mt-10">Error: {error.message}</div>;
@@ -48,13 +55,14 @@ const TodosPage = () => {
 
   const handleSearch = () => {
     setSearchTerm(searchInput);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page on search
   };
 
   return (
     <main className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">Todo List</h1>
 
+      {/* Search Input */}
       <div className="mb-6 flex gap-2">
         <input
           type="text"
@@ -71,6 +79,7 @@ const TodosPage = () => {
         </button>
       </div>
 
+      {/* Todo List */}
       <ul className="space-y-4">
         {currentTodos.length > 0 ? (
           currentTodos.map((todo) => (
@@ -93,6 +102,7 @@ const TodosPage = () => {
         )}
       </ul>
 
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-8 space-x-2">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
